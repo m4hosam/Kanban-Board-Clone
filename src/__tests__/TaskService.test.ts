@@ -25,28 +25,27 @@ describe("TaskService", () => {
         mockTask.status
       );
 
-      expect(result).toMatchObject({
-        title: mockTask.title,
-        description: mockTask.description,
-        status: mockTask.status,
+      expect(result).toEqual(mockTask);
+      expect(prismaMock.task.create).toHaveBeenCalledWith({
+        data: {
+          title: mockTask.title,
+          description: mockTask.description,
+          status: mockTask.status,
+        },
       });
-      expect(typeof result.id).toBe("string"); // Ensure id is a string
-      expect(result.createdAt).toBeInstanceOf(Date); // Ensure createdAt is a Date
-      expect(result.updatedAt).toBeInstanceOf(Date); // Ensure updatedAt is a Date
     });
+    it("should throw an error if Prisma fails", async () => {
+      const error = new Error("Prisma Error");
+      (prismaMock.task.create as jest.Mock).mockRejectedValue(error);
 
-    // it("should throw an error if Prisma fails", async () => {
-    //   const error = new Error("Prisma Error");
-    //   (prismaMock.task.create as jest.Mock).mockRejectedValue(error);
-
-    //   await expect(
-    //     taskService.createTask(
-    //       mockTask.title,
-    //       mockTask.description,
-    //       mockTask.status
-    //     )
-    //   ).rejects.toThrow("Prisma Error");
-    // });
+      await expect(
+        taskService.createTask(
+          mockTask.title,
+          mockTask.description,
+          mockTask.status
+        )
+      ).rejects.toThrow("Prisma Error");
+    });
   });
 
   describe("getAllTasks", () => {
