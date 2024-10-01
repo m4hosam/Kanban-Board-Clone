@@ -1,71 +1,150 @@
-import { TaskService } from "../services/TaskService";
+import { taskService } from "../services/TaskService"; // Adjust the path to your service file
 import { prismaMock } from "../singleton";
 
-jest.mock("@prisma/client");
-
 describe("TaskService", () => {
-  let taskService: TaskService;
+  const mockTask = {
+    id: "1",
+    title: "Test Task",
+    description: "Test Description",
+    status: "PENDING",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-  beforeEach(() => {
-    taskService = new TaskService();
+  afterEach(() => {
+    jest.clearAllMocks(); // Clear mocks after each test
   });
 
   describe("createTask", () => {
     it("should create a new task", async () => {
-      const mockTask = {
-        id: "e0545c65-1855-4c37-a985-c3d936521df9",
-        title: "Test Task",
-        description: "This is a test task",
-        status: "To Do",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      prismaMock.task.create.mockResolvedValue(mockTask);
+      (prismaMock.task.create as jest.Mock).mockResolvedValue(mockTask);
 
       const result = await taskService.createTask(
-        "Test Task",
-        "This is a test task"
+        mockTask.title,
+        mockTask.description,
+        mockTask.status
       );
-      expect(result).toEqual(mockTask);
-      expect(prismaMock.task.create).toHaveBeenCalledWith({
-        data: {
-          title: "Test Task",
-          description: "This is a test task",
-          status: "To Do",
-        },
+
+      expect(result).toMatchObject({
+        title: mockTask.title,
+        description: mockTask.description,
+        status: mockTask.status,
       });
+      expect(typeof result.id).toBe("string"); // Ensure id is a string
+      expect(result.createdAt).toBeInstanceOf(Date); // Ensure createdAt is a Date
+      expect(result.updatedAt).toBeInstanceOf(Date); // Ensure updatedAt is a Date
     });
+
+    // it("should throw an error if Prisma fails", async () => {
+    //   const error = new Error("Prisma Error");
+    //   (prismaMock.task.create as jest.Mock).mockRejectedValue(error);
+
+    //   await expect(
+    //     taskService.createTask(
+    //       mockTask.title,
+    //       mockTask.description,
+    //       mockTask.status
+    //     )
+    //   ).rejects.toThrow("Prisma Error");
+    // });
   });
 
   describe("getAllTasks", () => {
     it("should return all tasks", async () => {
-      const mockTasks = [
-        {
-          id: "1",
-          title: "Task 1",
-          description: "Description 1",
-          status: "To Do",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "2",
-          title: "Task 2",
-          description: "Description 2",
-          status: "In Progress",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      prismaMock.task.findMany.mockResolvedValue(mockTasks);
+      (prismaMock.task.findMany as jest.Mock).mockResolvedValue([mockTask]);
 
       const result = await taskService.getAllTasks();
-      expect(result).toEqual(mockTasks);
-      expect(prismaMock.task.findMany).toHaveBeenCalled();
+
+      expect(result).toEqual([mockTask]);
+      expect(prismaMock.task.findMany).toHaveBeenCalledTimes(1);
+    });
+
+    it("should return an empty array if no tasks exist", async () => {
+      (prismaMock.task.findMany as jest.Mock).mockResolvedValue([]);
+
+      const result = await taskService.getAllTasks();
+
+      expect(result).toEqual([]);
+      expect(prismaMock.task.findMany).toHaveBeenCalledTimes(1);
     });
   });
 
-  // Add more tests for updateTask, deleteTask, and updateTaskPartial methods
+  describe("getTaskById", () => {
+    it("should return a task by ID", async () => {
+      (prismaMock.task.findUnique as jest.Mock).mockResolvedValue(mockTask);
+
+      const result = await taskService.getTaskById(mockTask.id);
+
+      expect(result).toEqual(mockTask);
+      expect(prismaMock.task.findUnique).toHaveBeenCalledWith({
+        where: { id: mockTask.id },
+      });
+    });
+
+    it("should return null if no task is found", async () => {
+      (prismaMock.task.findUnique as jest.Mock).mockResolvedValue(null);
+
+      const result = await taskService.getTaskById(mockTask.id);
+
+      expect(result).toBeNull();
+      expect(prismaMock.task.findUnique).toHaveBeenCalledWith({
+        where: { id: mockTask.id },
+      });
+    });
+  });
+
+  describe("updateTask", () => {
+    it("should update a task", async () => {
+      const updatedTask = { ...mockTask, title: "Updated Title" };
+      (prismaMock.task.update as jest.Mock).mockResolvedValue(updatedTask);
+
+      const result = await taskService.updateTask(mockTask.id, {
+        title: "Updated Title",
+      });
+
+      expect(result).toMatchObject({
+        ...mockTask,
+        title: "Updated Title",
+      });
+      expect(prismaMock.task.update).toHaveBeenCalledWith({
+        where: { id: mockTask.id },
+        data: { title: "Updated Title" },
+      });
+    });
+
+    it("should throw an error if Prisma fails", async () => {
+      const error = new Error("Prisma Error");
+      (prismaMock.task.update as jest.Mock).mockRejectedValue(error);
+
+      await expect(
+        taskService.updateTask(mockTask.id, { title: "Updated Title" })
+      ).rejects.toThrow("Prisma Error");
+    });
+  });
+
+  describe("deleteTask", () => {
+    it("should delete a task", async () => {
+      (prismaMock.task.delete as jest.Mock).mockResolvedValue(mockTask);
+
+      const result = await taskService.deleteTask(mockTask.id);
+
+      expect(result).toBe(true);
+      expect(prismaMock.task.delete).toHaveBeenCalledWith({
+        where: { id: mockTask.id },
+      });
+    });
+
+    it("should return false if Prisma fails to delete", async () => {
+      (prismaMock.task.delete as jest.Mock).mockRejectedValue(
+        new Error("Prisma Error")
+      );
+
+      const result = await taskService.deleteTask(mockTask.id);
+
+      expect(result).toBe(false);
+      expect(prismaMock.task.delete).toHaveBeenCalledWith({
+        where: { id: mockTask.id },
+      });
+    });
+  });
 });

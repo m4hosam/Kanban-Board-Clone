@@ -2,13 +2,17 @@ import prisma from "../client";
 import { Task } from "../models/Task";
 
 export class TaskService {
-  async createTask(title: string, description: string): Promise<Task> {
+  async createTask(
+    title: string,
+    description: string,
+    status: string
+  ): Promise<Task> {
     try {
       return await prisma.task.create({
         data: {
           title,
           description,
-          status: "To Do",
+          status,
         },
       });
     } catch (error) {
