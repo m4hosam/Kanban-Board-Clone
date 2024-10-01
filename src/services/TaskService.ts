@@ -44,6 +44,14 @@ export class TaskService {
       return false;
     }
   }
+  async deleteAllTasks(): Promise<boolean> {
+    try {
+      await prisma.task.deleteMany();
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 export const taskService = new TaskService();
