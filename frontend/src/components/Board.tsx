@@ -29,8 +29,16 @@ export default function Board() {
 
   const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
-    if (!destination || source.droppableId === destination.droppableId) return;
+    if (!destination) return;
 
+    // If the task is dropped in the same position, do nothing
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    // Find the task being moved
     const task = findItemById(draggableId, [...toDo, ...inProgress, ...done]);
 
     if (task) {
@@ -56,7 +64,27 @@ export default function Board() {
         if (response.ok) {
           // Update frontend state
           deletePreviousState(source.droppableId, draggableId);
-          setNewState(destination.droppableId, task);
+          // Insert the task into the new position within the same or different column
+          if (destination.droppableId === source.droppableId) {
+            // Same column - reorder tasks
+            reorderTaskInSameColumn(
+              destination.droppableId,
+              source.index,
+              destination.index,
+              task
+            );
+          } else {
+            // Different column - update status and place the task in the new column
+            task.status =
+              destination.droppableId === "1"
+                ? "To Do"
+                : destination.droppableId === "2"
+                ? "In Progress"
+                : "Done";
+            task.updatedAt = new Date();
+            setNewState(destination.droppableId, task);
+          }
+          // setNewState(destination.droppableId, task);
         }
       } catch (error) {
         console.error("Failed to update task:", error);
@@ -64,24 +92,46 @@ export default function Board() {
     }
   };
 
-  // const handleDragEnd = (result: DropResult) => {
-  //   const { destination, source, draggableId } = result;
-  //   if (!destination || source.droppableId === destination.droppableId) return;
+  // Helper function to reorder tasks within the same column
+  const reorderTaskInSameColumn = (
+    droppableId: string,
+    sourceIndex: number,
+    destinationIndex: number,
+    movedTask: Task
+  ) => {
+    let columnTasks: Task[] = [];
 
-  //   const task = findItemById(draggableId, [...toDo, ...inProgress, ...done]);
+    // Get the tasks from the correct column
+    switch (droppableId) {
+      case "1":
+        columnTasks = [...toDo];
+        break;
+      case "2":
+        columnTasks = [...inProgress];
+        break;
+      case "3":
+        columnTasks = [...done];
+        break;
+    }
 
-  //   if (task) {
-  //     deletePreviousState(source.droppableId, draggableId);
-  //     task.status =
-  //       destination.droppableId === "1"
-  //         ? "To Do"
-  //         : destination.droppableId === "2"
-  //         ? "In Progress"
-  //         : "Done";
-  //     task.updatedAt = new Date();
-  //     setNewState(destination.droppableId, task);
-  //   }
-  // };
+    // Remove the task from the original position
+    columnTasks.splice(sourceIndex, 1);
+    // Add the task to the new position
+    columnTasks.splice(destinationIndex, 0, movedTask);
+
+    // Update the state with reordered tasks
+    switch (droppableId) {
+      case "1":
+        setToDo(columnTasks);
+        break;
+      case "2":
+        setInProgress(columnTasks);
+        break;
+      case "3":
+        setDone(columnTasks);
+        break;
+    }
+  };
 
   const addTask = async (
     taskTitle: string,

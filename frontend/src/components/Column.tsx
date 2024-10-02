@@ -45,7 +45,7 @@ export default function Column({
   };
 
   return (
-    <div className="column bg-gray-100 rounded-md w-[400px] h-[500px] overflow-y-scroll border scrollbar-hide">
+    <div className="column bg-gray-100 rounded-md w-[300px] md:w-[400px]  h-[500px] overflow-y-scroll border scrollbar-hide">
       <h3 className="p-2 bg-light-blue-500 text-center sticky top-0 z-10">
         {title}
       </h3>
