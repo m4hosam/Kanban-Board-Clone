@@ -1,6 +1,6 @@
-# Kanban Backend Service
+# Kanban Board Project
 
-This is a backend service for a Kanban board application built with Node.js, Express, TypeScript, and Prisma ORM. It provides RESTful API endpoints for managing tasks in a Kanban board.
+This project is a full-stack Kanban board application built using modern web technologies. It consists of a React frontend and a Node.js backend, both containerized using Docker for easy deployment and development.
 
 ## Table of Contents
 
@@ -10,102 +10,100 @@ This is a backend service for a Kanban board application built with Node.js, Exp
 4. [Prerequisites](#prerequisites)
 5. [Getting Started](#getting-started)
 6. [API Endpoints](#api-endpoints)
-7. [Running Tests](#running-tests)
-8. [Deployment](#deployment)
+7. [Frontend Usage](#frontend-usage)
+8. [Running Tests](#running-tests)
+9. [Deployment](#deployment)
 
 ## Features
 
-- Create, read, update, and delete tasks
-- Move tasks between different statuses (To Do, In Progress, Done)
-- RESTful API design
-- PostgreSQL database for data persistence
-- Dockerized application for easy deployment
+- **Add Tasks:** Easily add new tasks to any column.
+- **Edit Tasks:** Edit the title and description of tasks.
+- **Delete Tasks:** Remove tasks after confirmation.
+- **Drag-and-Drop:** Move tasks between columns using drag-and-drop.
+- **Responsive Design:** Works well on various screen sizes.
+- **RESTful API:** Backend provides a complete set of CRUD operations for tasks.
+- **Database Persistence:** Tasks are stored in a PostgreSQL database.
 
 ## Tech Stack
 
-- Node.js
-- Express.js
+### Frontend:
+
+- React with TypeScript
+- Vite for fast development and building
+- react-beautiful-dnd for drag-and-drop functionality
+- shadcn UI and TailwindCSS for styling
+- react-icons for UI icons
+
+### Backend:
+
+- Node.js with Express
 - TypeScript
-- Prisma ORM
-- PostgreSQL
-- Jest (for testing)
-- Docker
+- Prisma ORM for database operations
+- PostgreSQL for data storage
+- Jest for testing
+
+### DevOps:
+
+- Docker and Docker Compose for containerization
+- Postman collection for API testing
 
 ## Folder Structure
 
 ```
-kanban-backend/
+kanban-board-project/
 │
-├── src/
-│   ├── controllers/
-│   │   └── TaskController.ts
-│   ├── models/
-│   │   └── Task.ts
-│   ├── routes/
-│   │   └── taskRoutes.ts
-│   ├── services/
-│   │   └── TaskService.ts
-│   └── app.ts
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │       ├── ui/
+│   │       ├── Board.tsx
+│   │       ├── Card.tsx
+│   │       ├── Column.tsx
+│   │       └── scroll.css
+│   │   ├── App.tsx
+│   ├── public/
+│   ├── package.json
+│   └── Dockerfile
 │
-├── prisma/
-│   └── schema.prisma
+├── backend/
+│   ├── src/
+│   │   ├── __tests__/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── app.ts
+│   ├── prisma/
+│   ├── __tests__/
+│   ├── package.json
+│   └── Dockerfile
 │
-├── __tests__/
-│   ├── TaskService.test.ts
-│   └── TaskController.test.ts
-│
-├── dist/            # Compiled JavaScript files
-├── node_modules/
-├── .env
-├── .gitignore
 ├── docker-compose.yml
-├── Dockerfile
-├── jest.config.js
-├── package.json
-├── README.md
-└── tsconfig.json
+├── Kanban Pigon.postman_collection.json
+└── README.md
 ```
 
 ## Prerequisites
 
-- Node.js (v14 or later)
 - Docker and Docker Compose
-- PostgreSQL (if running locally without Docker)
+- Node.js (v20 or later) for local development
 
 ## Getting Started
 
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/kanban-backend.git
-   cd kanban-backend
+   git clone https://github.com/m4hosam/pigon-kanban-clone.git
+   cd pigon-kanban-clone
    ```
 
-2. Install dependencies:
-
-   ```
-   npm install
-   ```
-
-3. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
-
-   ```
-   DATABASE_URL="postgresql://kanbanuser:kanbanpassword@postgres:5432/kanban?schema=public"
-   ```
-
-4. Run the application using Docker:
+2. Start the application using Docker Compose:
 
    ```
    docker-compose up --build
    ```
 
-5. Run Prisma migrations:
-   ```
-   docker-compose exec backend npx prisma migrate dev
-   ```
-
-The server should now be running at `http://localhost:3000`.
+The frontend will be available at `http://localhost:8080`, and the backend API at `http://localhost:3000`.
 
 ## API Endpoints
 
@@ -115,33 +113,19 @@ The server should now be running at `http://localhost:3000`.
 - `PATCH /tasks/:id`: Partially update a task
 - `DELETE /tasks/:id`: Delete a task
 
+For detailed API testing, you can use the provided Postman collection: `Kanban Pigon.postman_collection.json`.
+
+## Frontend Usage
+
+1. **Adding a Task**: Click the "Add Task" button, enter a title and description, then click "Add."
+2. **Editing a Task**: Click the edit icon on a task, make changes, and click "Save."
+3. **Deleting a Task**: Click the delete icon and confirm the deletion.
+4. **Drag-and-Drop**: Click and drag a task to move it between columns.
+
 ## Running Tests
 
-To run the test suite:
+### Backend Tests
 
 ```
-npm test
+npm run test
 ```
-
-## Deployment
-
-1. Ensure you have Docker and Docker Compose installed on your deployment machine.
-
-2. Clone the repository on your deployment machine.
-
-3. Create a `.env` file with the appropriate database URL for your production environment.
-
-4. Build and run the Docker containers:
-
-   ```
-   docker-compose up --build -d
-   ```
-
-5. Run Prisma migrations:
-   ```
-   docker-compose exec backend npx prisma migrate deploy
-   ```
-
-Your Kanban backend service should now be deployed and running.
-
-For any issues or questions, please open an issue in the GitHub repository.

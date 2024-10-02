@@ -10,12 +10,22 @@ export interface Task {
   updatedAt: Date;
 }
 
-// src/types.ts
-// export interface Task {
-//   id: string;
-//   title: string;
-//   description: string;
-//   status: "todo" | "in-progress" | "done";
-// }
+export interface ColumnProps {
+  title: string;
+  tasks: Task[];
+  id: string;
+  addTask: (
+    taskTitle: string,
+    taskDescription: string,
+    columnId: string
+  ) => void;
+  updateTask: (id: string, updatedTask: Partial<Task>) => void;
+  deleteTask: (id: string) => void;
+}
 
-// export type Status = "todo" | "in-progress" | "done";
+export interface CardProps {
+  task: Task;
+  index: number;
+  updateTask: (id: string, updatedTask: Partial<Task>) => void;
+  deleteTask: (id: string) => void;
+}
