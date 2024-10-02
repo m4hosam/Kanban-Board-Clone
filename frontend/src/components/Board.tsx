@@ -136,7 +136,7 @@ export default function Board() {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <h2 style={{ textAlign: "center" }}>PROGRESS BOARD</h2>
+      <h2 style={{ textAlign: "center" }}>Kanban Board</h2>
       <div className="flex justify-between items-center flex-row w-1300 mx-auto gap-7">
         <Column
           title={"TO DO"}

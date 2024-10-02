@@ -96,15 +96,16 @@ export default function TaskCard({
               </button>
             </div>
           )}
-          <div className="flex justify-end p-1">
+          <div className="flex justify-end items-end  p-1 mt-2">
             {isEditing ? (
               // Display Save and Cancel buttons while editing
               <>
-                <Button className="py-0 px-3 mr-2" onClick={handleSave}>
+                <Button className="py-0 px-3 mr-2 w-1/2" onClick={handleSave}>
                   Save
                 </Button>
                 <Button
-                  className="py-0 px-3"
+                  className="py-0 px-3 w-1/2"
+                  variant="destructive"
                   onClick={() => setIsEditing(false)}
                 >
                   Cancel
@@ -115,7 +116,9 @@ export default function TaskCard({
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <MdDelete className="text-red-600 " />
+                  <button className="bg-transparent hover:border-white py-2 px-3">
+                    <MdDelete className="text-red-600 " />
+                  </button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>

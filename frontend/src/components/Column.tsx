@@ -8,12 +8,8 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Task } from "@/types";
-
-// interface Task {
-//   id: number;
-//   title: string;
-//   completed: boolean;
-// }
+import "./scroll.css";
+import { IoIosAdd } from "react-icons/io";
 
 interface ColumnProps {
   title: string;
@@ -49,7 +45,7 @@ export default function Column({
   };
 
   return (
-    <div className="bg-gray-100 rounded-md w-[400px] h-[900px] overflow-y-scroll border border-gray-300 scrollbar-hide">
+    <div className="column bg-gray-100 rounded-md w-[400px] h-[500px] overflow-y-scroll border scrollbar-hide">
       <h3 className="p-2 bg-light-blue-500 text-center sticky top-0 z-10">
         {title}
       </h3>
@@ -86,9 +82,9 @@ export default function Column({
         ) : (
           <button
             onClick={() => setIsAddingTask(true)}
-            className="bg-blue-500 text-white p-1 w-full rounded-md"
+            className="flex bg-slate-400 text-white py-2 w-full rounded-md text-center items-center justify-center"
           >
-            Add Task
+            <IoIosAdd size={18} className="text-black" />
           </button>
         )}
       </div>
