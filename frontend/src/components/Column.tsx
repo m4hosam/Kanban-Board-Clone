@@ -46,7 +46,7 @@ export default function Column({
 
   return (
     <div className="column bg-gray-100 rounded-md w-[300px] md:w-[400px]  h-[500px] overflow-y-scroll border scrollbar-hide">
-      <h3 className="p-2 bg-light-blue-500 text-center sticky top-0 z-10">
+      <h3 className="p-2 bg-green-600 text-white font-medium bg-light-blue-500 text-center sticky top-0 z-10">
         {title}
       </h3>
 
@@ -82,7 +82,7 @@ export default function Column({
         ) : (
           <button
             onClick={() => setIsAddingTask(true)}
-            className="flex bg-slate-400 text-white py-2 w-full rounded-md text-center items-center justify-center"
+            className="flex bg-green-200 text-white py-2 w-full rounded-md text-center items-center justify-center"
           >
             <IoIosAdd size={18} className="text-black" />
           </button>

@@ -82,10 +82,14 @@ export default function TaskCard({
             <div className="flex flex-row gap-2 items-start">
               <div className="flex flex-col gap-2 w-[90%]">
                 <div>
-                  <p className="text-left text-black">{task.title}</p>
+                  <p className="text-left text-black font-medium">
+                    {task.title}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-left text-gray-500">{task.description}</p>
+                  <p className="text-left text-gray-500 text-sm">
+                    {task.description}
+                  </p>
                 </div>
               </div>
               <button

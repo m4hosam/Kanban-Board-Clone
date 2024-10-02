@@ -261,10 +261,10 @@ export default function Board() {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <h2 style={{ textAlign: "center" }}>Kanban Board</h2>
-      <div className="flex justify-between items-center flex-row w-1300 mx-auto gap-7">
+      <h1 className="text-center text-2xl font-medium">Kanban Board</h1>
+      <div className="flex justify-between items-center overflow-x-auto flex-row w-1300 mx-auto gap-7">
         <Column
-          title={"TO DO"}
+          title={"To Do"}
           tasks={toDo}
           id={"1"}
           addTask={addTask}
@@ -272,7 +272,7 @@ export default function Board() {
           deleteTask={deleteTask}
         />
         <Column
-          title={"IN PROGRESS"}
+          title={"In Progress"}
           tasks={inProgress}
           id={"2"}
           addTask={addTask}
@@ -280,7 +280,7 @@ export default function Board() {
           deleteTask={deleteTask}
         />
         <Column
-          title={"DONE"}
+          title={"Done"}
           tasks={done}
           id={"3"}
           addTask={addTask}
