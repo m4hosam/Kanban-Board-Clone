@@ -27,75 +27,150 @@ export default function Board() {
       });
   }, []);
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
     if (!destination || source.droppableId === destination.droppableId) return;
 
     const task = findItemById(draggableId, [...toDo, ...inProgress, ...done]);
 
     if (task) {
-      deletePreviousState(source.droppableId, draggableId);
-      task.status =
+      const newStatus =
         destination.droppableId === "1"
           ? "To Do"
           : destination.droppableId === "2"
           ? "In Progress"
           : "Done";
-      task.updatedAt = new Date();
-      setNewState(destination.droppableId, task);
+
+      const updatedTask = { ...task, status: newStatus };
+
+      // Send update request to the backend
+      try {
+        const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedTask),
+        });
+
+        if (response.ok) {
+          // Update frontend state
+          deletePreviousState(source.droppableId, draggableId);
+          setNewState(destination.droppableId, task);
+        }
+      } catch (error) {
+        console.error("Failed to update task:", error);
+      }
     }
   };
 
-  const addTask = (
+  // const handleDragEnd = (result: DropResult) => {
+  //   const { destination, source, draggableId } = result;
+  //   if (!destination || source.droppableId === destination.droppableId) return;
+
+  //   const task = findItemById(draggableId, [...toDo, ...inProgress, ...done]);
+
+  //   if (task) {
+  //     deletePreviousState(source.droppableId, draggableId);
+  //     task.status =
+  //       destination.droppableId === "1"
+  //         ? "To Do"
+  //         : destination.droppableId === "2"
+  //         ? "In Progress"
+  //         : "Done";
+  //     task.updatedAt = new Date();
+  //     setNewState(destination.droppableId, task);
+  //   }
+  // };
+
+  const addTask = async (
     taskTitle: string,
     taskDescription: string,
     columnId: string
   ) => {
-    const newTask: Task = {
-      id: Date.now().toString(),
+    const newTask = {
       title: taskTitle,
       description: taskDescription,
       status:
         columnId === "1" ? "To Do" : columnId === "2" ? "In Progress" : "Done",
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
-    switch (columnId) {
-      case "1":
-        setToDo((prev) => [...prev, newTask]);
-        break;
-      case "2":
-        setInProgress((prev) => [...prev, newTask]);
-        break;
-      case "3":
-        setDone((prev) => [...prev, newTask]);
-        break;
+    try {
+      const response = await fetch("http://localhost:3000/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newTask),
+      });
+
+      const createdTask = await response.json();
+
+      // Now, add the task to the appropriate column in the frontend state
+      switch (columnId) {
+        case "1":
+          setToDo((prev) => [...prev, createdTask]);
+          break;
+        case "2":
+          setInProgress((prev) => [...prev, createdTask]);
+          break;
+        case "3":
+          setDone((prev) => [...prev, createdTask]);
+          break;
+      }
+    } catch (error) {
+      console.error("Failed to add task:", error);
     }
   };
 
-  const updateTask = (taskId: string, updatedTask: Partial<Task>) => {
-    setToDo((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, ...updatedTask } : task
-      )
-    );
-    setInProgress((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, ...updatedTask } : task
-      )
-    );
-    setDone((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, ...updatedTask } : task
-      )
-    );
+  const updateTask = async (taskId: string, updatedTask: Partial<Task>) => {
+    try {
+      const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedTask),
+      });
+
+      if (response.ok) {
+        // Update task in the frontend state after successful update
+        setToDo((prev) =>
+          prev.map((task) =>
+            task.id === taskId ? { ...task, ...updatedTask } : task
+          )
+        );
+        setInProgress((prev) =>
+          prev.map((task) =>
+            task.id === taskId ? { ...task, ...updatedTask } : task
+          )
+        );
+        setDone((prev) =>
+          prev.map((task) =>
+            task.id === taskId ? { ...task, ...updatedTask } : task
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
   };
 
-  const deleteTask = (taskId: string) => {
-    setToDo((prev) => prev.filter((task) => task.id !== taskId));
-    setInProgress((prev) => prev.filter((task) => task.id !== taskId));
-    setDone((prev) => prev.filter((task) => task.id !== taskId));
+  const deleteTask = async (taskId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove the task from the frontend state
+        setToDo((prev) => prev.filter((task) => task.id !== taskId));
+        setInProgress((prev) => prev.filter((task) => task.id !== taskId));
+        setDone((prev) => prev.filter((task) => task.id !== taskId));
+      }
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
   };
 
   function findItemById(id: string, array: Task[]): Task | undefined {
