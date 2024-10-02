@@ -1,49 +1,59 @@
 // src/components/Column.tsx
-import { Droppable, Draggable } from "react-beautiful-dnd";
-import { Task } from "../types";
+import React from "react";
+import { Droppable } from "react-beautiful-dnd";
 import TaskCard from "./TaskCard";
+import AddTaskForm from "./AddTaskForm";
+import { Task, ColumnType } from "../types";
 
 interface ColumnProps {
-  title: string;
+  title: ColumnType;
   tasks: Task[];
-  onEditTask: (taskId: string) => void;
-  onDeleteTask: (taskId: string) => void;
+  onAddTask: (title: string, description: string, status: ColumnType) => void;
+  onEditTask: (id: string, title: string, description: string) => void;
+  onDeleteTask: (id: string) => void;
 }
 
 const Column: React.FC<ColumnProps> = ({
   title,
   tasks,
+  onAddTask,
   onEditTask,
   onDeleteTask,
 }) => {
   return (
-    <Droppable droppableId={title.toLowerCase().replace(" ", "-")}>
-      {(provided) => (
+    <Droppable droppableId={title}>
+      {(provided, snapshot) => (
         <div
-          ref={provided.innerRef}
           {...provided.droppableProps}
-          className="bg-gray-100 p-4 rounded-lg w-80 min-h-[200px]"
+          ref={provided.innerRef}
+          style={{
+            minWidth: "300px",
+            background: snapshot.isDraggingOver ? "#e0e0e0" : "#f4f5f7",
+            borderRadius: "5px",
+            padding: "10px",
+            transition: "background-color 0.2s ease",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
-          <h2 className="text-lg font-semibold mb-4">{title}</h2>
-          {tasks.map((task, index) => (
-            <Draggable key={task.id} draggableId={task.id} index={index}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  className="mb-2"
-                >
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onEdit={onEditTask}
-                    onDelete={onDeleteTask}
-                  />
-                </div>
-              )}
-            </Draggable>
-          ))}
+          <h2>{title}</h2>
+          <AddTaskForm
+            onAddTask={(taskTitle, description) =>
+              onAddTask(taskTitle, description, title)
+            }
+          />
+          <div style={{ flexGrow: 1, minHeight: "100px" }}>
+            {tasks.map((task, index) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                index={index}
+                onEditTask={onEditTask}
+                onDeleteTask={onDeleteTask}
+              />
+            ))}
+          </div>
           {provided.placeholder}
         </div>
       )}

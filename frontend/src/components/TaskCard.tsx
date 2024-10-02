@@ -1,26 +1,75 @@
 // src/components/TaskCard.tsx
+import React, { useState } from "react";
+import { Draggable } from "react-beautiful-dnd";
 import { Task } from "../types";
 
 interface TaskCardProps {
   task: Task;
-  onEdit: (taskId: string) => void;
-  onDelete: (taskId: string) => void;
+  index: number;
+  onEditTask: (id: string, title: string, description: string) => void;
+  onDeleteTask: (id: string) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
+const TaskCard: React.FC<TaskCardProps> = ({
+  task,
+  index,
+  onEditTask,
+  onDeleteTask,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onEditTask(task.id, title, description);
+    setIsEditing(false);
+  };
+
   return (
-    <div className="bg-white shadow rounded p-4 mb-2">
-      <h3 className="font-semibold">{task.title}</h3>
-      <p className="text-gray-500">{task.description}</p>
-      <div className="flex justify-between mt-2">
-        <button onClick={() => onEdit(task.id)} className="text-blue-500">
-          Edit
-        </button>
-        <button onClick={() => onDelete(task.id)} className="text-red-500">
-          Delete
-        </button>
-      </div>
-    </div>
+    <Draggable draggableId={task.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            userSelect: "none",
+            padding: 16,
+            margin: "0 0 8px 0",
+            minHeight: "50px",
+            backgroundColor: snapshot.isDragging ? "#f0f0f0" : "white",
+            boxShadow: snapshot.isDragging
+              ? "0 5px 10px rgba(0, 0, 0, 0.1)"
+              : "none",
+            borderRadius: "4px",
+            ...provided.draggableProps.style,
+          }}
+        >
+          {isEditing ? (
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+              <button type="submit">Save</button>
+            </form>
+          ) : (
+            <>
+              <h3>{task.title}</h3>
+              <p>{task.description}</p>
+              <button onClick={() => setIsEditing(true)}>Edit</button>
+              <button onClick={() => onDeleteTask(task.id)}>Delete</button>
+            </>
+          )}
+        </div>
+      )}
+    </Draggable>
   );
 };
 

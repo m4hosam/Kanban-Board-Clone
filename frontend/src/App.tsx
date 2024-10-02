@@ -1,55 +1,55 @@
-import React, { useState } from "react";
+// src/App.tsx
+import React, { useState, useRef, useEffect } from "react";
+import { DragDropContext, DropResult, DragStart } from "react-beautiful-dnd";
 import Column from "./components/Column";
-import { Task } from "./types";
-import { v4 as uuidv4 } from "uuid";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
-
-const initialTasks: Task[] = [
-  {
-    id: uuidv4(),
-    title: "Task 1",
-    description: "Description 1",
-    status: "todo",
-  },
-  {
-    id: uuidv4(),
-    title: "Task 2",
-    description: "Description 2",
-    status: "in-progress",
-  },
-];
-
-const columnsOrder = ["todo", "in-progress", "done"];
+import { Task, ColumnType } from "./types";
 
 const App: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const scrollTimerRef = useRef<number | null>(null);
 
-  const addTask = () => {
-    const newTask: Task = {
-      id: uuidv4(),
-      title: "New Task",
-      description: "New Task Description",
-      status: "todo",
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current) {
+        clearInterval(scrollTimerRef.current);
+      }
     };
-    setTasks([...tasks, newTask]);
+  }, []);
+
+  const onDragStart = (start: DragStart) => {
+    if (scrollTimerRef.current) {
+      clearInterval(scrollTimerRef.current);
+    }
+    const scrollInterval = 15;
+    const scrollStep = 5;
+    const scrollThreshold = 100;
+
+    scrollTimerRef.current = window.setInterval(() => {
+      const columnElement = document.querySelector(
+        `[data-rbd-droppable-id='${start.source.droppableId}']`
+      );
+      if (columnElement) {
+        const rect = columnElement.getBoundingClientRect();
+        const mouseY = (window as any).mousePosY || 0;
+
+        if (mouseY < rect.top + scrollThreshold) {
+          columnElement.scrollTop -= scrollStep;
+        } else if (mouseY > rect.bottom - scrollThreshold) {
+          columnElement.scrollTop += scrollStep;
+        }
+      }
+    }, scrollInterval);
   };
 
-  const editTask = (taskId: string) => {
-    // Edit task logic
-  };
-
-  const deleteTask = (taskId: string) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
-  };
-
-  // Handle task drag and drop between columns
   const onDragEnd = (result: DropResult) => {
-    const { destination, source, draggableId } = result;
+    if (scrollTimerRef.current) {
+      clearInterval(scrollTimerRef.current);
+    }
 
-    // If there's no destination (e.g., dropped outside any droppable), do nothing
+    const { source, destination } = result;
+
     if (!destination) return;
 
-    // If the task is dropped in the same position, do nothing
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
@@ -57,49 +57,68 @@ const App: React.FC = () => {
       return;
     }
 
-    // Get the source column and destination column
-    const sourceColumn = source.droppableId;
-    const destinationColumn = destination.droppableId;
+    const newTasks = Array.from(tasks);
+    const draggedTask = newTasks.find(
+      (task, index) =>
+        task.status === source.droppableId && index === source.index
+    );
 
-    // Move task between columns
-    setTasks((prevTasks) => {
-      const newTasks = [...prevTasks];
+    if (!draggedTask) return;
 
-      // Remove task from source column
-      const [movedTask] = newTasks.splice(source.index, 1);
+    newTasks.splice(newTasks.indexOf(draggedTask), 1);
+    draggedTask.status = destination.droppableId as ColumnType;
 
-      // Update the task's status based on the new column
-      movedTask.status = destinationColumn as "todo" | "in-progress" | "done";
+    newTasks.splice(
+      newTasks.findIndex((task) => task.status === destination.droppableId) +
+        destination.index,
+      0,
+      draggedTask
+    );
 
-      // Add task to destination column at the correct position
-      newTasks.splice(destination.index, 0, movedTask);
-
-      return newTasks;
-    });
+    setTasks(newTasks);
   };
 
-  return (
-    <div className="container mx-auto p-4">
-      <button
-        onClick={addTask}
-        className="mb-4 bg-blue-500 text-white p-2 rounded"
-      >
-        Add Task
-      </button>
+  const addTask = (title: string, description: string, status: ColumnType) => {
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title,
+      description,
+      status,
+    };
+    setTasks([...tasks, newTask]);
+  };
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex space-x-4">
-          {columnsOrder.map((col) => (
+  const editTask = (id: string, title: string, description: string) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, title, description } : task
+      )
+    );
+  };
+
+  const deleteTask = (id: string) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
+  const columns: ColumnType[] = ["To Do", "In Progress", "Done"];
+
+  return (
+    <div className="App">
+      <h1>Kanban Board</h1>
+      <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            height: "calc(100vh - 100px)",
+          }}
+        >
+          {columns.map((columnTitle) => (
             <Column
-              key={col}
-              title={
-                col === "todo"
-                  ? "To Do"
-                  : col === "in-progress"
-                  ? "In Progress"
-                  : "Done"
-              }
-              tasks={tasks.filter((task) => task.status === col)}
+              key={columnTitle}
+              title={columnTitle}
+              tasks={tasks.filter((task) => task.status === columnTitle)}
+              onAddTask={addTask}
               onEditTask={editTask}
               onDeleteTask={deleteTask}
             />
