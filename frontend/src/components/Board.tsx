@@ -23,7 +23,7 @@ export default function Board() {
         setDone(json.filter((task) => task.status === "Done"));
         setToDo(json.filter((task) => task.status === "To Do"));
         setInProgress(json.filter((task) => task.status === "In Progress"));
-        console.log(toDo);
+        // console.log(toDo);
       });
   }, []);
 
@@ -74,6 +74,30 @@ export default function Board() {
     }
   };
 
+  const updateTask = (taskId: string, updatedTask: Partial<Task>) => {
+    setToDo((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+      )
+    );
+    setInProgress((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+      )
+    );
+    setDone((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+      )
+    );
+  };
+
+  const deleteTask = (taskId: string) => {
+    setToDo((prev) => prev.filter((task) => task.id !== taskId));
+    setInProgress((prev) => prev.filter((task) => task.id !== taskId));
+    setDone((prev) => prev.filter((task) => task.id !== taskId));
+  };
+
   function findItemById(id: string, array: Task[]): Task | undefined {
     return array.find((item) => item.id === id);
   }
@@ -114,14 +138,30 @@ export default function Board() {
     <DragDropContext onDragEnd={handleDragEnd}>
       <h2 style={{ textAlign: "center" }}>PROGRESS BOARD</h2>
       <div className="flex justify-between items-center flex-row w-1300 mx-auto gap-7">
-        <Column title={"TO DO"} tasks={toDo} id={"1"} addTask={addTask} />
         <Column
-          title={"IN Progress"}
+          title={"TO DO"}
+          tasks={toDo}
+          id={"1"}
+          addTask={addTask}
+          updateTask={updateTask}
+          deleteTask={deleteTask}
+        />
+        <Column
+          title={"IN PROGRESS"}
           tasks={inProgress}
           id={"2"}
           addTask={addTask}
+          updateTask={updateTask}
+          deleteTask={deleteTask}
         />
-        <Column title={"DONE"} tasks={done} id={"3"} addTask={addTask} />
+        <Column
+          title={"DONE"}
+          tasks={done}
+          id={"3"}
+          addTask={addTask}
+          updateTask={updateTask}
+          deleteTask={deleteTask}
+        />
       </div>
     </DragDropContext>
   );

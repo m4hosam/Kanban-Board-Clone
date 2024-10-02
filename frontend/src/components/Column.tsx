@@ -23,10 +23,19 @@ interface ColumnProps {
     taskTitle: string,
     taskDescription: string,
     columnId: string
-  ) => void; // New prop to add tasks
+  ) => void;
+  updateTask: (id: string, updatedTask: Partial<Task>) => void;
+  deleteTask: (id: string) => void;
 }
 
-export default function Column({ title, tasks, id, addTask }: ColumnProps) {
+export default function Column({
+  title,
+  tasks,
+  id,
+  addTask,
+  updateTask,
+  deleteTask,
+}: ColumnProps) {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
@@ -94,7 +103,13 @@ export default function Column({ title, tasks, id, addTask }: ColumnProps) {
             }`}
           >
             {tasks.map((task, index) => (
-              <Card key={task.id} index={index} task={task} />
+              <Card
+                key={task.id}
+                index={index}
+                task={task}
+                updateTask={updateTask}
+                deleteTask={deleteTask}
+              />
             ))}
             {provided.placeholder}
           </div>
