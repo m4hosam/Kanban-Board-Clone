@@ -5,12 +5,13 @@ import {
   DraggableStateSnapshot,
 } from "react-beautiful-dnd";
 import styled from "styled-components";
+import { Task } from "@/types";
 
-interface Task {
-  id: number;
-  title: string;
-  completed: boolean;
-}
+// interface Task {
+//   id: number;
+//   title: string;
+//   completed: boolean;
+// }
 
 interface CardProps {
   task: Task;

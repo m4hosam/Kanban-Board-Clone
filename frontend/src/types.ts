@@ -6,6 +6,8 @@ export interface Task {
   title: string;
   description: string;
   status: ColumnType;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // src/types.ts

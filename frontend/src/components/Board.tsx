@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
-import {
-  DragDropContext,
-  DropResult,
-  DraggableLocation,
-} from "react-beautiful-dnd";
+import React, { useState, useEffect } from "react";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Column from "./Column";
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
-  completed: boolean;
+  description: string;
+  status: "To Do" | "In Progress" | "Done";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export default function Board() {
@@ -18,101 +17,111 @@ export default function Board() {
   const [done, setDone] = useState<Task[]>([]);
 
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/todos")
+    fetch("http://localhost:3000/tasks")
       .then((response) => response.json())
       .then((json: Task[]) => {
-        setDone(json.filter((task) => task.completed));
-        setToDo(json.filter((task) => !task.completed));
+        setDone(json.filter((task) => task.status === "Done"));
+        setToDo(json.filter((task) => task.status === "To Do"));
+        setInProgress(json.filter((task) => task.status === "In Progress"));
+        console.log(toDo);
       });
   }, []);
 
   const handleDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
+    if (!destination || source.droppableId === destination.droppableId) return;
 
-    if (!destination) return;
+    const task = findItemById(draggableId, [...toDo, ...inProgress, ...done]);
 
-    const sourceList = getList(source.droppableId);
-    const destList = getList(destination.droppableId);
-
-    if (source.droppableId === destination.droppableId) {
-      const reorderedList = reorder(
-        sourceList,
-        source.index,
-        destination.index
-      );
-      updateList(source.droppableId, reorderedList);
-      console.log(reorderedList);
-    } else {
-      const result = move(sourceList, destList, source, destination);
-      updateList(source.droppableId, result[source.droppableId]);
-      updateList(destination.droppableId, result[destination.droppableId]);
+    if (task) {
+      deletePreviousState(source.droppableId, draggableId);
+      task.status =
+        destination.droppableId === "1"
+          ? "To Do"
+          : destination.droppableId === "2"
+          ? "In Progress"
+          : "Done";
+      task.updatedAt = new Date();
+      setNewState(destination.droppableId, task);
     }
   };
 
-  const getList = (droppableId: string): Task[] => {
-    switch (droppableId) {
-      case "1":
-        return toDo;
-      case "2":
-        return inProgress;
-      case "3":
-        return done;
-      default:
-        return [];
-    }
-  };
+  const addTask = (
+    taskTitle: string,
+    taskDescription: string,
+    columnId: string
+  ) => {
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: taskTitle,
+      description: taskDescription,
+      status:
+        columnId === "1" ? "To Do" : columnId === "2" ? "In Progress" : "Done",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-  const updateList = (droppableId: string, newList: Task[]) => {
-    switch (droppableId) {
+    switch (columnId) {
       case "1":
-        setToDo(newList);
+        setToDo((prev) => [...prev, newTask]);
         break;
       case "2":
-        setInProgress(newList);
+        setInProgress((prev) => [...prev, newTask]);
         break;
       case "3":
-        setDone(newList);
+        setDone((prev) => [...prev, newTask]);
         break;
     }
   };
 
-  const reorder = (
-    list: Task[],
-    startIndex: number,
-    endIndex: number
-  ): Task[] => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    return result;
-  };
+  function findItemById(id: string, array: Task[]): Task | undefined {
+    return array.find((item) => item.id === id);
+  }
 
-  const move = (
-    source: Task[],
-    destination: Task[],
-    droppableSource: DraggableLocation,
-    droppableDestination: DraggableLocation
-  ): { [key: string]: Task[] } => {
-    const sourceClone = Array.from(source);
-    const destClone = Array.from(destination);
-    const [removed] = sourceClone.splice(droppableSource.index, 1);
+  function removeItemById(id: string, array: Task[]): Task[] {
+    return array.filter((item) => item.id !== id);
+  }
 
-    destClone.splice(droppableDestination.index, 0, removed);
+  function deletePreviousState(sourceDroppableId: string, taskId: string) {
+    switch (sourceDroppableId) {
+      case "1":
+        setToDo(removeItemById(taskId, toDo));
+        break;
+      case "2":
+        setInProgress(removeItemById(taskId, inProgress));
+        break;
+      case "3":
+        setDone(removeItemById(taskId, done));
+        break;
+    }
+  }
 
-    const result: { [key: string]: Task[] } = {};
-    result[droppableSource.droppableId] = sourceClone;
-    result[droppableDestination.droppableId] = destClone;
-
-    return result;
-  };
+  function setNewState(destinationDroppableId: string, task: Task) {
+    switch (destinationDroppableId) {
+      case "1":
+        setToDo((prev) => [task, ...prev]);
+        break;
+      case "2":
+        setInProgress((prev) => [task, ...prev]);
+        break;
+      case "3":
+        setDone((prev) => [task, ...prev]);
+        break;
+    }
+  }
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <h2 style={{ textAlign: "center" }}>PROGRESS BOARD</h2>
       <div className="flex justify-between items-center flex-row w-1300 mx-auto gap-7">
-        <Column title={"TO DO"} tasks={toDo} id={"1"} />
-        <Column title={"IN Progress"} tasks={inProgress} id={"2"} />
-        <Column title={"DONE"} tasks={done} id={"3"} />
+        <Column title={"TO DO"} tasks={toDo} id={"1"} addTask={addTask} />
+        <Column
+          title={"IN Progress"}
+          tasks={inProgress}
+          id={"2"}
+          addTask={addTask}
+        />
+        <Column title={"DONE"} tasks={done} id={"3"} addTask={addTask} />
       </div>
     </DragDropContext>
   );
