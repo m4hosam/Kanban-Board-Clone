@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Column from "./Column";
 
@@ -11,13 +11,16 @@ interface Task {
   updatedAt: Date;
 }
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export default function Board() {
+  console.log(import.meta.env);
   const [toDo, setToDo] = useState<Task[]>([]);
   const [inProgress, setInProgress] = useState<Task[]>([]);
   const [done, setDone] = useState<Task[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/tasks")
+    fetch(`${apiUrl}/tasks`)
       .then((response) => response.json())
       .then((json: Task[]) => {
         setDone(json.filter((task) => task.status === "Done"));
@@ -53,7 +56,7 @@ export default function Board() {
 
       // Send update request to the backend
       try {
-        const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+        const response = await fetch(`${apiUrl}/tasks/${task.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -146,7 +149,7 @@ export default function Board() {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/tasks", {
+      const response = await fetch(`${apiUrl}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -175,7 +178,7 @@ export default function Board() {
 
   const updateTask = async (taskId: string, updatedTask: Partial<Task>) => {
     try {
-      const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
+      const response = await fetch(`${apiUrl}/tasks/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -208,7 +211,7 @@ export default function Board() {
 
   const deleteTask = async (taskId: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
+      const response = await fetch(`${apiUrl}/tasks/${taskId}`, {
         method: "DELETE",
       });
 
