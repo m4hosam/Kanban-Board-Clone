@@ -7,7 +7,7 @@ import {
 } from "react-beautiful-dnd";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Task, ColumnProps } from "@/types";
+import { ColumnProps } from "@/types";
 import "./scroll.css"; // Custom CSS for scrollbars
 import { IoIosAdd } from "react-icons/io"; // Icon for the Add Task button
 

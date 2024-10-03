@@ -7,7 +7,7 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { Task, CardProps } from "@/types";
+import { CardProps } from "@/types";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import {
