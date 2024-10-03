@@ -126,6 +126,28 @@ For detailed API testing, you can use the provided Postman collection: `Kanban P
 
 ### Backend Tests
 
-```
+Before running the tests, ensure that all dependencies are installed and the `DATABASE_URL` for PostgreSQL is added to your `.env` file.
+
+To run the backend tests, execute the following command:
+
+```bash
 npm run test
 ```
+
+For more details, refer to the [Backend README](backend/README.md).
+
+### Frontend E2E Tests
+
+Ensure that all dependencies are installed and the `VITE_API_URL` for the backend is included in your `.env` file.
+
+To run the end-to-end tests for the frontend, use the following command:
+
+```bash
+npm run cypress:open
+```
+
+For more information, check the [Frontend README](frontend/README.md).
+
+---
+
+Feel free to adjust any part of it further!

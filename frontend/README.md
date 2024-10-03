@@ -44,8 +44,8 @@ Ensure you have the following installed on your system:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/kanban-board-clone.git
-   cd kanban-board-clone
+   git clone https://github.com/m4hosam/pigon-kanban-clone.git
+   cd pigon-kanban-clone/frontend
    ```
 
 2. **Install dependencies:**
@@ -59,6 +59,10 @@ Ensure you have the following installed on your system:
 3. **Set up environment variables:**
 
    If you have a `.env` file for the backend (PostgreSQL connection), configure the environment variables accordingly.
+
+   ```
+   VITE_API_URL='http://localhost:3000'
+   ```
 
 4. **Run the project:**
 
@@ -76,12 +80,12 @@ Ensure you have the following installed on your system:
    npm run build
    ```
 
-6. **Run unit tests:**
+6. **Run e2e tests:**
 
-   The project uses **Jest** for testing. Run the tests with:
+   The project uses **Cypress** for e2e testing. Run the tests with:
 
    ```bash
-   npm run test
+   npm run cypress:open
    ```
 
 ## Folder Structure
@@ -98,12 +102,3 @@ Ensure you have the following installed on your system:
 2. **Editing a Task**: Click the edit icon on a task to change its title or description. Click "Save" to update the task.
 3. **Deleting a Task**: Click the delete icon, confirm the deletion, and the task will be removed.
 4. **Drag-and-Drop**: Click and drag a task to move it between columns.
-
-## License
-
-This project is open-source and available under the MIT License.
-
-```
-
-Feel free to adjust the instructions or add more details about your backend if necessary!
-```

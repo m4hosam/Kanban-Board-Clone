@@ -77,8 +77,8 @@ kanban-backend/
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/kanban-backend.git
-   cd kanban-backend
+   git clone https://github.com/m4hosam/pigon-kanban-clone.git
+   cd pigon-kanban-clone/backend
    ```
 
 2. Install dependencies:
@@ -88,7 +88,7 @@ kanban-backend/
    ```
 
 3. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
+   Create a `.env` file in the root directory and add your postgreSQL connection as following:
 
    ```
    DATABASE_URL="postgresql://kanbanuser:kanbanpassword@postgres:5432/kanban?schema=public"
@@ -98,11 +98,6 @@ kanban-backend/
 
    ```
    docker-compose up --build
-   ```
-
-5. Run Prisma migrations:
-   ```
-   docker-compose exec backend npx prisma migrate dev
    ```
 
 The server should now be running at `http://localhost:3000`.
@@ -137,10 +132,7 @@ npm test
    docker-compose up --build -d
    ```
 
-5. Run Prisma migrations:
-   ```
-   docker-compose exec backend npx prisma migrate deploy
-   ```
+
 
 Your Kanban backend service should now be deployed and running.
 
