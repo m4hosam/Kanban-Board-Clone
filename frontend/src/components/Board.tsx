@@ -181,7 +181,7 @@ export default function Board() {
 
     setColumns((prev) => {
       const newColumns = { ...prev };
-      for (const [status, columnKey] of Object.entries(COLUMNS)) {
+      for (const [_, columnKey] of Object.entries(COLUMNS)) {
         const index = prev[columnKey].findIndex((task) => task.id === taskId);
         if (index !== -1) {
           deletedTask = prev[columnKey][index];
@@ -283,8 +283,13 @@ export default function Board() {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <h1 className="text-center text-2xl font-medium">Kanban Board</h1>
-      <div className="flex justify-between items-center overflow-x-auto flex-row w-1300 mx-auto gap-7">
+      <h1 className="text-center text-2xl font-medium" data-cy="board-title">
+        Kanban Board
+      </h1>
+      <div
+        className="flex justify-between items-center overflow-x-auto flex-row w-1300 mx-auto gap-7"
+        data-cy="board-columns"
+      >
         {(Object.entries(COLUMNS) as [ColumnType, keyof ColumnsState][]).map(
           ([title, key]) => (
             <Column
@@ -295,6 +300,7 @@ export default function Board() {
               addTask={addTask}
               updateTask={updateTask}
               deleteTask={deleteTask}
+              data-cy={`column-${key}`}
             />
           )
         )}

@@ -35,67 +35,73 @@ export default function Column({
   };
 
   return (
-    <div className="column bg-gray-100 rounded-md w-[300px] md:w-[400px]  md:h-[500px] h-[470px] overflow-y-scroll border scrollbar-hide">
-      {/* Column title */}
-      <h3 className="p-2 bg-green-600 text-white font-medium text-center sticky top-0 z-10">
+    <div
+      className="column bg-gray-100 rounded-md w-[300px] md:w-[400px] md:h-[500px] h-[470px] overflow-y-scroll border scrollbar-hide"
+      data-cy={`column-${id.toLowerCase().replace(" ", "-")}`}
+    >
+      <h3
+        className="p-2 bg-green-600 text-white font-medium text-center sticky top-0 z-10"
+        data-cy="column-title"
+      >
         {title}
       </h3>
 
-      {/* Section to add a new task */}
       <div className="p-2">
         {isAddingTask ? (
-          <div className="flex flex-col gap-2">
-            {/* Input for task title */}
+          <div className="flex flex-col gap-2 " data-cy="add-task-form">
             <Input
               type="text"
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               placeholder="Title"
+              data-cy="new-task-title"
             />
-            {/* Input for task description */}
             <Input
               type="text"
               value={newTaskDescription}
               onChange={(e) => setNewTaskDescription(e.target.value)}
               placeholder="Description"
+              data-cy="new-task-description"
             />
             <div className="flex gap-2">
-              {/* Button to add task */}
-              <Button onClick={handleAddTask} className="rounded-md w-1/2">
+              <Button
+                onClick={handleAddTask}
+                className="rounded-md w-1/2"
+                data-cy="add-task-submit"
+              >
                 Add Task
               </Button>
-              {/* Button to cancel task creation */}
               <Button
                 onClick={() => setIsAddingTask(false)}
                 className="rounded-md w-1/2"
                 variant="destructive"
+                data-cy="add-task-cancel"
               >
                 Cancel
               </Button>
             </div>
           </div>
         ) : (
-          // Button to show the form for adding a new task
           <button
             onClick={() => setIsAddingTask(true)}
             className="flex bg-green-200 text-white py-3 w-full rounded-md text-center items-center justify-center"
+            data-cy="add-task-button"
           >
             <FaPlus size={13} className="text-green-900 " />
           </button>
         )}
       </div>
 
-      {/* Droppable area for drag-and-drop functionality */}
       <Droppable droppableId={id}>
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`p-1 transition-colors ease-in-out duration-200 flex-grow min-h-[100px] ${
+            className={`p-1 transition-colors ease-in-out duration-200 flex-grow min-h-[100px] border-r-4 ${
               snapshot.isDraggingOver ? "bg-gray-300" : "bg-gray-100"
             }`}
+            data-cy="task-list"
           >
-            {/* Mapping through tasks and rendering them as Cards */}
             {tasks.map((task, index) => (
               <Card
                 key={task.id}
@@ -105,7 +111,6 @@ export default function Column({
                 deleteTask={deleteTask}
               />
             ))}
-            {/* Placeholder for proper drag-and-drop spacing */}
             {provided.placeholder}
           </div>
         )}
