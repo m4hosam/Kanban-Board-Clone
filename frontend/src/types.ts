@@ -5,7 +5,7 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: ColumnType;
+  status: "To Do" | "In Progress" | "Done";
   createdAt: Date;
   updatedAt: Date;
 }
