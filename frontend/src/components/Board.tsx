@@ -44,6 +44,7 @@ export default function Board() {
     fetchTasks();
   }, [fetchTasks]);
 
+  // Used to update task status when dragged and dropped
   const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
     if (!destination) return;
@@ -87,6 +88,7 @@ export default function Board() {
       return newColumns;
     });
 
+    // Update task status in the database
     try {
       const response = await fetch(`${apiUrl}/tasks/${task.id}`, {
         method: "PUT",
@@ -103,6 +105,7 @@ export default function Board() {
     }
   };
 
+  // Revert task status change if update fails
   const revertDragChange = (
     task: Task,
     sourceKey: keyof ColumnsState,
@@ -119,6 +122,7 @@ export default function Board() {
     });
   };
 
+  // Function to add a new task
   const addTask = async (
     taskTitle: string,
     taskDescription: string,
@@ -169,6 +173,7 @@ export default function Board() {
     }
   };
 
+  // Function to delete a task
   const deleteTask = async (taskId: string) => {
     let deletedTask: Task | undefined;
     let taskColumn: keyof ColumnsState | undefined;

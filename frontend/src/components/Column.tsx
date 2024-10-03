@@ -9,7 +9,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ColumnProps } from "@/types";
 import "./scroll.css"; // Custom CSS for scrollbars
-import { IoIosAdd } from "react-icons/io"; // Icon for the Add Task button
+import { FaPlus } from "react-icons/fa";
 
 export default function Column({
   title,
@@ -35,7 +35,7 @@ export default function Column({
   };
 
   return (
-    <div className="column bg-gray-100 rounded-md w-[300px] md:w-[400px] h-[500px] overflow-y-scroll border scrollbar-hide">
+    <div className="column bg-gray-100 rounded-md w-[300px] md:w-[400px]  md:h-[500px] h-[470px] overflow-y-scroll border scrollbar-hide">
       {/* Column title */}
       <h3 className="p-2 bg-green-600 text-white font-medium text-center sticky top-0 z-10">
         {title}
@@ -78,9 +78,9 @@ export default function Column({
           // Button to show the form for adding a new task
           <button
             onClick={() => setIsAddingTask(true)}
-            className="flex bg-green-200 text-white py-2 w-full rounded-md text-center items-center justify-center"
+            className="flex bg-green-200 text-white py-3 w-full rounded-md text-center items-center justify-center"
           >
-            <IoIosAdd size={18} className="text-black" />
+            <FaPlus size={13} className="text-green-900 " />
           </button>
         )}
       </div>
